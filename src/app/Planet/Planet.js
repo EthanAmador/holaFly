@@ -18,9 +18,13 @@ class Planet {
         method: "GET",
         logging: true,
       });
+      if (!planetFormService) {
+        throw Error(`this planet doesn't exist in service `);
+      }
       const { name, gravity } = planetFormService;
       this.name = name;
       this.gravity = gravity;
+      await db.swPlanet.create({ id: this.id, name, gravity });
     }
   }
 

@@ -33,7 +33,7 @@ class AbstractPeople {
     return this.homeworlId;
   }
 
-  getWeightOnPlanet(planetId) {
+  async getWeightOnPlanet(planetId) {
     throw new Error("To be implemented");
   }
 }

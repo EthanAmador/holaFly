@@ -1,7 +1,11 @@
 const AbstractPeople = require("./abstractPeople");
 const { planetFactory } = require("../Planet");
 const db = require("../db");
-const { httpRequest } = require("../swapiFunctions");
+const {
+  httpRequest,
+  getGravityByString,
+  getWeightOnPlanet,
+} = require("../swapiFunctions");
 
 class CommonPeople extends AbstractPeople {
   constructor(id) {
@@ -43,8 +47,34 @@ class CommonPeople extends AbstractPeople {
     }
   }
 
-  getWeightOnPlanet(planetId) {
-    throw new Error("To be implemented");
+  async getWeightOnPlanet(planetId) {
+    const planet = await planetFactory(planetId);
+
+    const strHomeWorldId = this.getHomeworlId();
+    const homeWorldId = strHomeWorldId[strHomeWorldId.length - 1];
+
+    if (homeWorldId == planetId) {
+      throw Error(
+        "It's not possible to calculate the weight of the people on its home planet. "
+      );
+    }
+    // TODO validate if people doesn't have mass or is unknow
+    const result = getGravityByString(planet.getGravity());
+    const WeightOnPlanet = {};
+    for (const gravity in result) {
+      if (Object.hasOwnProperty.call(result, gravity)) {
+        const gravityValue = result[gravity];
+        WeightOnPlanet[gravity] = getWeightOnPlanet(
+          this.getMass(),
+          gravityValue
+        );
+      }
+    }
+    return {
+      person: { name: this.getName(), mass: this.getMass() },
+      planet: { name: planet.getName(), gravity: planet.getGravity() },
+      weighOnPlanet: WeightOnPlanet,
+    };
   }
 }
 module.exports = CommonPeople;

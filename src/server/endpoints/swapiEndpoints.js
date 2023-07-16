@@ -6,7 +6,8 @@ const _isWookieeFormat = (req) => {
 };
 
 const applySwapiEndpoints = (server, app) => {
-  const { people } = app.factories;
+  const { people, planet } = app.factories;
+  const { getRandomNumber } = app.swapiFunctions;
 
   server.get("/hfswapi/test", async (req, res) => {
     const data = await app.swapiFunctions.genericRequest(
@@ -27,11 +28,19 @@ const applySwapiEndpoints = (server, app) => {
   });
 
   server.get("/hfswapi/getPlanet/:id", async (req, res) => {
-    res.sendStatus(501);
+    const { id } = req.params;
+    const { name, gravity } = await planet.planetFactory(id);
+    res.send({ name, gravity });
   });
 
   server.get("/hfswapi/getWeightOnPlanetRandom", async (req, res) => {
-    res.sendStatus(501);
+    // TODO validate ranges to get random number
+    const numberRandomPeople = getRandomNumber(1, 82);
+    const numberRandomPlanet = getRandomNumber(1, 60);
+    const peopleResult = await people.peopleFactory(numberRandomPeople, null);
+    const result = await peopleResult.getWeightOnPlanet(numberRandomPlanet);
+    res.send(result);
+    // res.sendStatus(501);
   });
 
   server.get("/hfswapi/getLogs", async (req, res) => {
