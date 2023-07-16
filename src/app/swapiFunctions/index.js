@@ -1,25 +1,10 @@
-const fetch = require('node-fetch');
+const httpRequest = require("./httpRequest");
 
 const getWeightOnPlanet = (mass, gravity) => {
-    return mass * gravity;
-}
-
-const genericRequest = async (url, method, body, logging = false) => {
-    const options = {
-        method: method
-    }
-    if(body){
-        options.body = body;
-    }
-    const response = await fetch(url, options);
-    const data = await response.json();
-    if(logging){
-        console.log(data);
-    }
-    return data;
-}
+  return mass * gravity;
+};
 
 module.exports = {
-    getWeightOnPlanet,
-    genericRequest
-}
+  getWeightOnPlanet,
+  httpRequest,
+};
