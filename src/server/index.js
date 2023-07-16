@@ -11,11 +11,21 @@ const createExpressServer = async (app) => {
   await app.db.populateDB();
 
   server.get("/", async (req, res) => {
-    if (process.env.NODE_ENV === "develop") {
-      res.send("Test Enviroment");
-    } else {
-      res.sendStatus(200);
-    }
+    res.status(200).send("App running........");
+  });
+
+  //middleware ruta no existe
+  server.use((req, res, next) => {
+    const error = new Error(`Ruta no encontrada: ${req.originalUrl}`);
+    error.status = 404;
+    next(error);
+  });
+
+  //middleware error
+  server.use((error, req, res, next) => {
+    console.error(`${req.method} ${req.url} ${error}`);
+    const statusCode = error.status || 500;
+    return res.status(statusCode).send({ error: error.message });
   });
 
   return server;

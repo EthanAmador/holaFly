@@ -1,15 +1,11 @@
-const loggingMiddleware = (db) =>
-    (req, res, next) => {
-        const ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress || '').split(',')[0].trim();
-        const headers = JSON.stringify(req.headers);
-        const originalUrl = req.originalUrl;
-        // Persist this info on DB
-        console.log({
-            ip,
-            headers,
-            originalUrl
-        })
-        next();
-    }
+const loggingMiddleware = (db) => async (req, res, next) => {
+  const action = `${req.method}-${req.path}`;
+  const header = JSON.stringify(req.headers);
+  const ip = req.ip;
+
+  await db.logging.create({ action, header, ip });
+
+  next();
+};
 
 module.exports = loggingMiddleware;

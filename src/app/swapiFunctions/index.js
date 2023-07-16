@@ -14,14 +14,13 @@ const getFloatValueFromString = (str) => {
 };
 
 const getStringValue = (str) => {
-  // TODO validate this regex in other condition
   const regex = /[a-zA-Z()]+/g;
   const regexMatch = str.match(regex);
   if (regexMatch && regexMatch.length > 0) {
     const letters = regexMatch.join("");
     return letters;
   }
-  throw Error(`Invalid text gravity`);
+  return "default";
 };
 
 const getGravityByString = (str) => {
@@ -38,9 +37,13 @@ const getGravityByString = (str) => {
 const getRandomNumber = (min, max) =>
   Math.floor(Math.random() * (max - min + 1) + min);
 
+const isValueValid = (value) =>
+  ["unknown", "N/A"].some((word) => value.includes(word));
+
 module.exports = {
   getWeightOnPlanet,
   httpRequest,
   getGravityByString,
   getRandomNumber,
+  isValueValid,
 };

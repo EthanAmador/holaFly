@@ -10,42 +10,62 @@ const applySwapiEndpoints = (server, app) => {
   const { getRandomNumber } = app.swapiFunctions;
 
   server.get("/hfswapi/test", async (req, res) => {
-    const data = await app.swapiFunctions.genericRequest(
-      "https://swapi.dev/api/",
-      "GET",
-      null,
-      true
-    );
-    res.send(data);
+    try {
+      const data = await app.swapiFunctions.genericRequest(
+        "https://swapi.dev/api/",
+        "GET",
+        null,
+        true
+      );
+      res.status(200).send(data);
+    } catch (error) {
+      next(error);
+    }
   });
 
-  server.get("/hfswapi/getPeople/:id", async (req, res) => {
+  server.get("/hfswapi/getPeople/:id", async (req, res, next) => {
     const { id } = req.params;
-    const { name, mass, height, homeworldName, homeworlId } =
-      await people.peopleFactory(+id, null);
+    try {
+      const { name, mass, height, homeworldName, homeworlId } =
+        await people.peopleFactory(+id, null);
 
-    res.send({ name, mass, height, homeworldName, homeworlId });
+      res.status(200).send({ name, mass, height, homeworldName, homeworlId });
+    } catch (error) {
+      next(error);
+    }
   });
 
-  server.get("/hfswapi/getPlanet/:id", async (req, res) => {
+  server.get("/hfswapi/getPlanet/:id", async (req, res, next) => {
     const { id } = req.params;
-    const { name, gravity } = await planet.planetFactory(id);
-    res.send({ name, gravity });
+    try {
+      const { name, gravity } = await planet.planetFactory(id);
+      res.status(200).send({ name, gravity });
+    } catch (error) {
+      next(error);
+    }
   });
 
-  server.get("/hfswapi/getWeightOnPlanetRandom", async (req, res) => {
-    // TODO validate ranges to get random number
-    const numberRandomPeople = getRandomNumber(1, 82);
-    const numberRandomPlanet = getRandomNumber(1, 60);
-    const peopleResult = await people.peopleFactory(numberRandomPeople, null);
-    const result = await peopleResult.getWeightOnPlanet(numberRandomPlanet);
-    res.send(result);
-    // res.sendStatus(501);
+  server.get("/hfswapi/getWeightOnPlanetRandom", async (req, res, next) => {
+    let { peopleId, planetId } = req.query;
+    try {
+      peopleId = peopleId ?? getRandomNumber(1, 82);
+      planetId = planetId ?? getRandomNumber(1, 60);
+
+      const peopleResult = await people.peopleFactory(peopleId, null);
+      const result = await peopleResult.getWeightOnPlanet(planetId);
+      res.status(200).send(result);
+    } catch (error) {
+      next(error);
+    }
   });
 
-  server.get("/hfswapi/getLogs", async (req, res) => {
-    const data = await app.db.logging.findAll();
-    res.send(data);
+  server.get("/hfswapi/getLogs", async (req, res, next) => {
+    try {
+      const data = await app.db.logging.findAll({ order: [["id", "DESC"]] });
+      res.status(200).send(data);
+    } catch (error) {
+      next(error);
+    }
   });
 };
 

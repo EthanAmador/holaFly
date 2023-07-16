@@ -5,6 +5,7 @@ const {
   httpRequest,
   getGravityByString,
   getWeightOnPlanet,
+  isValueValid,
 } = require("../swapiFunctions");
 
 class CommonPeople extends AbstractPeople {
@@ -44,6 +45,15 @@ class CommonPeople extends AbstractPeople {
       const planetName = planet.getName();
       this.homeworldName = planetName;
       this.homeworlId = `/planets/${planetId}`;
+
+      await db.swPeople.create({
+        id: this.id,
+        name: this.name,
+        mass: +this.mass,
+        height: +this.height,
+        homeworld_name: this.homeworldName,
+        homeworld_id: this.homeworlId,
+      });
     }
   }
 
@@ -58,23 +68,30 @@ class CommonPeople extends AbstractPeople {
         "It's not possible to calculate the weight of the people on its home planet. "
       );
     }
-    // TODO validate if people doesn't have mass or is unknow
-    const result = getGravityByString(planet.getGravity());
-    const WeightOnPlanet = {};
-    for (const gravity in result) {
-      if (Object.hasOwnProperty.call(result, gravity)) {
-        const gravityValue = result[gravity];
-        WeightOnPlanet[gravity] = getWeightOnPlanet(
-          this.getMass(),
-          gravityValue
-        );
-      }
-    }
-    return {
+    const planetGravity = planet.getGravity();
+    const isGravityValid = isValueValid(planetGravity);
+    const isMassValid = isValueValid(this.getMass() + "");
+
+    const objResult = {
       person: { name: this.getName(), mass: this.getMass() },
-      planet: { name: planet.getName(), gravity: planet.getGravity() },
-      weighOnPlanet: WeightOnPlanet,
+      planet: { name: planet.getName(), gravity: planetGravity },
     };
+    if (!isGravityValid && !isMassValid) {
+      const result = getGravityByString(planetGravity);
+      const WeightOnPlanet = {};
+      for (const gravity in result) {
+        if (Object.hasOwnProperty.call(result, gravity)) {
+          const gravityValue = result[gravity];
+          WeightOnPlanet[gravity] = getWeightOnPlanet(
+            this.getMass(),
+            gravityValue
+          );
+        }
+      }
+      objResult.weighOnPlanet = WeightOnPlanet;
+    }
+
+    return objResult;
   }
 }
 module.exports = CommonPeople;
