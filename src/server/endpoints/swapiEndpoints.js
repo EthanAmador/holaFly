@@ -5,11 +5,9 @@ const _isWookieeFormat = (req) => {
   return false;
 };
 
-const _holis = ({ db }) => {
-  console.log(db);
-};
-
 const applySwapiEndpoints = (server, app) => {
+  const { people } = app.factories;
+
   server.get("/hfswapi/test", async (req, res) => {
     const data = await app.swapiFunctions.genericRequest(
       "https://swapi.dev/api/",
@@ -21,9 +19,11 @@ const applySwapiEndpoints = (server, app) => {
   });
 
   server.get("/hfswapi/getPeople/:id", async (req, res) => {
-    console.log(req);
-    _holis(app);
-    res.sendStatus(501);
+    const { id } = req.params;
+    const { name, mass, height, homeworldName, homeworlId } =
+      await people.peopleFactory(+id, null);
+
+    res.send({ name, mass, height, homeworldName, homeworlId });
   });
 
   server.get("/hfswapi/getPlanet/:id", async (req, res) => {
