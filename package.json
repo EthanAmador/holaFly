@@ -9,6 +9,9 @@
     "sequelize-cli": "^6.4.1",
     "sqlite3": "^5.0.8"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "name": "prueba_tecnica_holafly",
   "version": "1.0.0",
   "description": "Prueba Técnica de Holafly",

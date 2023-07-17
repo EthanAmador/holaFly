@@ -1,6 +1,7 @@
 const applySwapiEndpoints = (server, app) => {
   const { people, planet } = app.factories;
   const { getRandomNumber, isWookieeFormat } = app.swapiFunctions;
+  const { validateNumberParam } = app.customMiddleWares;
 
   server.get("/hfswapi/test", async (req, res) => {
     try {
@@ -16,29 +17,37 @@ const applySwapiEndpoints = (server, app) => {
     }
   });
 
-  server.get("/hfswapi/getPeople/:id", async (req, res, next) => {
-    const { id } = req.params;
-    try {
-      const isWookiee = isWookieeFormat(req);
+  server.get(
+    "/hfswapi/getPeople/:id",
+    validateNumberParam,
+    async (req, res, next) => {
+      const { id } = req.params;
+      try {
+        const isWookiee = isWookieeFormat(req);
 
-      const { name, mass, height, homeworldName, homeworlId } =
-        await people.peopleFactory(+id, isWookiee);
+        const { name, mass, height, homeworldName, homeworlId } =
+          await people.peopleFactory(+id, isWookiee);
 
-      res.status(200).send({ name, mass, height, homeworldName, homeworlId });
-    } catch (error) {
-      next(error);
+        res.status(200).send({ name, mass, height, homeworldName, homeworlId });
+      } catch (error) {
+        next(error);
+      }
     }
-  });
+  );
 
-  server.get("/hfswapi/getPlanet/:id", async (req, res, next) => {
-    const { id } = req.params;
-    try {
-      const { name, gravity } = await planet.planetFactory(id);
-      res.status(200).send({ name, gravity });
-    } catch (error) {
-      next(error);
+  server.get(
+    "/hfswapi/getPlanet/:id",
+    validateNumberParam,
+    async (req, res, next) => {
+      const { id } = req.params;
+      try {
+        const { name, gravity } = await planet.planetFactory(id);
+        res.status(200).send({ name, gravity });
+      } catch (error) {
+        next(error);
+      }
     }
-  });
+  );
 
   server.get("/hfswapi/getWeightOnPlanetRandom", async (req, res, next) => {
     let { peopleId, planetId } = req.query;

@@ -1,9 +1,13 @@
 const express = require("express");
 const applyEndpoints = require("./endpoints");
 const applyMiddlewares = require("./middlewares");
+const validateNumberParam = require("./middlewares/validateNumberParameter");
 
 const createExpressServer = async (app) => {
   const server = express();
+  app.customMiddleWares = {
+    validateNumberParam,
+  };
   applyMiddlewares(server, app);
   applyEndpoints(server, app);
 
