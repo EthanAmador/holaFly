@@ -40,10 +40,14 @@ const getRandomNumber = (min, max) =>
 const isValueValid = (value) =>
   ["unknown", "N/A"].some((word) => value.includes(word));
 
+const isWookieeFormat = (req) =>
+  req.query.format && req.query.format == "wookiee";
+
 module.exports = {
   getWeightOnPlanet,
-  httpRequest,
   getGravityByString,
   getRandomNumber,
   isValueValid,
+  isWookieeFormat,
+  httpRequest,
 };

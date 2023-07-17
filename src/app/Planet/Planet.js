@@ -1,3 +1,4 @@
+const config = require("../../../config");
 const { httpRequest } = require("../swapiFunctions");
 const db = require("../db");
 
@@ -14,7 +15,7 @@ class Planet {
       this.gravity = gravity;
     } else {
       const planetFormService = await httpRequest.genericRequest({
-        url: `https://swapi.dev/api/planets/${this.id}`,
+        url: `${config.swApiBaseUrl}/planets/${this.id}`,
         method: "GET",
         logging: true,
       });
@@ -24,7 +25,10 @@ class Planet {
       const { name, gravity } = planetFormService;
       this.name = name;
       this.gravity = gravity;
-      await db.swPlanet.create({ id: this.id, name, gravity });
+
+      if (config.saveRequest) {
+        await db.swPlanet.create({ id: this.id, name, gravity });
+      }
     }
   }
 

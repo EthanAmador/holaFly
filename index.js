@@ -1,3 +1,3 @@
-require('dotenv').config();
+require("./config");
 console.clear();
-require('./src');
+require("./src");

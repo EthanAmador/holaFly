@@ -1,13 +1,6 @@
-const _isWookieeFormat = (req) => {
-  if (req.query.format && req.query.format == "wookiee") {
-    return true;
-  }
-  return false;
-};
-
 const applySwapiEndpoints = (server, app) => {
   const { people, planet } = app.factories;
-  const { getRandomNumber } = app.swapiFunctions;
+  const { getRandomNumber, isWookieeFormat } = app.swapiFunctions;
 
   server.get("/hfswapi/test", async (req, res) => {
     try {
@@ -26,8 +19,10 @@ const applySwapiEndpoints = (server, app) => {
   server.get("/hfswapi/getPeople/:id", async (req, res, next) => {
     const { id } = req.params;
     try {
+      const isWookiee = isWookieeFormat(req);
+
       const { name, mass, height, homeworldName, homeworlId } =
-        await people.peopleFactory(+id, null);
+        await people.peopleFactory(+id, isWookiee);
 
       res.status(200).send({ name, mass, height, homeworldName, homeworlId });
     } catch (error) {
@@ -50,8 +45,9 @@ const applySwapiEndpoints = (server, app) => {
     try {
       peopleId = peopleId ?? getRandomNumber(1, 82);
       planetId = planetId ?? getRandomNumber(1, 60);
+      const isWookiee = isWookieeFormat(req);
 
-      const peopleResult = await people.peopleFactory(peopleId, null);
+      const peopleResult = await people.peopleFactory(peopleId, isWookiee);
       const result = await peopleResult.getWeightOnPlanet(planetId);
       res.status(200).send(result);
     } catch (error) {
